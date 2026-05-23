@@ -7,10 +7,6 @@ import {
   WiThunderstorm,
   WiSnow,
   WiFog,
-  WiHumidity,
-  WiStrongWind,
-  WiThermometer,
-  WiBarometer,
 } from "react-icons/wi";
 
 import {
@@ -72,6 +68,24 @@ function App() {
 
   const [unit, setUnit] =
     useState("celsius");
+
+  const [toast, setToast] =
+    useState("");
+
+  /* =========================================================
+     TOAST
+  ========================================================= */
+
+  function showToast(message) {
+
+    setToast(message);
+
+    setTimeout(() => {
+
+      setToast("");
+
+    }, 2500);
+  }
 
   /* =========================================================
      CLOCK
@@ -352,33 +366,6 @@ function App() {
   }
 
   /* =========================================================
-     WEATHER BY COORDS
-  ========================================================= */
-
-  async function getWeatherByCoords(
-    latitude,
-    longitude,
-    customPlace
-  ) {
-
-    const response =
-      await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,pressure_msl&daily=weather_code,temperature_2m_max,temperature_2m_min,uv_index_max&timezone=auto`
-      );
-
-    const data =
-      await response.json();
-
-    setWeather(data);
-
-    setPlace(customPlace);
-
-    setTimezone(
-      data.timezone
-    );
-  }
-
-  /* =========================================================
      GET WEATHER
   ========================================================= */
 
@@ -417,16 +404,27 @@ function App() {
       const location =
         geoData.results[0];
 
-      await getWeatherByCoords(
-        location.latitude,
-        location.longitude,
-        {
-          name:
-            location.name,
+      const weatherResponse =
+        await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${location.latitude}&longitude=${location.longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`
+        );
 
-          country:
-            location.country,
-        }
+      const weatherData =
+        await weatherResponse.json();
+
+      setWeather(
+        weatherData
+      );
+
+      setPlace({
+        name:
+          location.name,
+        country:
+          location.country,
+      });
+
+      setTimezone(
+        weatherData.timezone
       );
 
       setInput(
@@ -448,7 +446,7 @@ function App() {
   }
 
   /* =========================================================
-     GEOLOCATION
+     POSITION
   ========================================================= */
 
   async function handleMyPosition() {
@@ -480,14 +478,14 @@ function App() {
 
           const weatherResponse =
             await fetch(
-              `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,pressure_msl&daily=weather_code,temperature_2m_max,temperature_2m_min,uv_index_max&timezone=auto`
+              `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`
             );
 
           const weatherData =
             await weatherResponse.json();
 
           let cityName =
-            "Ma position";
+            "Ta position";
 
           let countryName =
             "";
@@ -516,11 +514,9 @@ function App() {
                   .country;
             }
 
-          } catch (geoError) {
+          } catch (err) {
 
-            console.log(
-              geoError
-            );
+            console.log(err);
           }
 
           setWeather(
@@ -528,7 +524,8 @@ function App() {
           );
 
           setPlace({
-            name: cityName,
+            name:
+              cityName,
             country:
               countryName,
           });
@@ -539,6 +536,10 @@ function App() {
 
           setInput(
             cityName
+          );
+
+          showToast(
+            `📍 Tu es à ${cityName}`
           );
 
           setLoading(false);
@@ -562,12 +563,6 @@ function App() {
         );
 
         setLoading(false);
-      },
-
-      {
-        enableHighAccuracy:true,
-        timeout:10000,
-        maximumAge:0,
       }
     );
   }
@@ -641,6 +636,11 @@ function App() {
         place.name
       )
     ) {
+
+      showToast(
+        "Déjà dans les favoris ⭐"
+      );
+
       return;
     }
 
@@ -655,6 +655,10 @@ function App() {
     localStorage.setItem(
       "favorites",
       JSON.stringify(updated)
+    );
+
+    showToast(
+      `${place.name} ajouté aux favoris ⭐`
     );
   }
 
@@ -674,6 +678,10 @@ function App() {
       "favorites",
       JSON.stringify(updated)
     );
+
+    showToast(
+      `${cityName} retiré des favoris`
+    );
   }
 
   const code =
@@ -692,590 +700,16 @@ function App() {
       }`}
     >
 
-      <aside className="sidebar">
-
-        <div className="side-logo">
-
-          {
-            getWeatherIcon(
-              code || 1,
-              "side-weather-icon"
-            )
-          }
-
-        </div>
-
-        <button className="side-btn active">
-          <FiHome />
-        </button>
-
-        <button
-          className="side-btn"
-          onClick={
-            handleMyPosition
-          }
-        >
-          <FiMapPin />
-        </button>
-
-        <button
-          className="side-btn"
-          onClick={() => {
-
-            setShowFavorites(
-              !showFavorites
-            );
-
-            setShowSettings(
-              false
-            );
-          }}
-        >
-          <FiStar />
-        </button>
-
-        <button
-          className="side-btn"
-          onClick={() => {
-
-            setShowSettings(
-              !showSettings
-            );
-
-            setShowFavorites(
-              false
-            );
-          }}
-        >
-          <FiSettings />
-        </button>
-
-      </aside>
-
       {
-        showFavorites && (
+        toast && (
 
-          <div className="popup-panel">
+          <div className="toast-message">
 
-            <div className="popup-header">
-
-              <h3>
-                ⭐ Favoris
-              </h3>
-
-              <button
-                className="close-popup"
-                onClick={() =>
-                  setShowFavorites(false)
-                }
-              >
-                ✕
-              </button>
-
-            </div>
-
-            <button
-              className="popup-item"
-              onClick={
-                addFavorite
-              }
-            >
-              + Ajouter {
-                place?.name
-              }
-            </button>
-
-            <div className="favorites-scroll">
-
-              {
-                favorites.length === 0 && (
-
-                  <p className="empty-text">
-                    Aucun favori 😭
-                  </p>
-                )
-              }
-
-              {
-                favorites.map(
-                  (fav) => (
-
-                    <div
-                      key={fav}
-                      className="favorite-row"
-                    >
-
-                      <button
-                        className="popup-item favorite-city"
-                        onClick={() => {
-
-                          setInput(fav);
-
-                          setCity(fav);
-
-                          setShowFavorites(false);
-                        }}
-                      >
-                        {fav}
-                      </button>
-
-                      <button
-                        className="delete-fav"
-                        onClick={() =>
-                          removeFavorite(
-                            fav
-                          )
-                        }
-                      >
-                        ✕
-                      </button>
-
-                    </div>
-                  )
-                )
-              }
-
-            </div>
+            {toast}
 
           </div>
         )
       }
-
-      {
-        showSettings && (
-
-          <div className="popup-panel">
-
-            <div className="popup-header">
-
-              <h3>
-                ⚙️ Paramètres
-              </h3>
-
-              <button
-                className="close-popup"
-                onClick={() =>
-                  setShowSettings(false)
-                }
-              >
-                ✕
-              </button>
-
-            </div>
-
-            <button
-              className="popup-item"
-              onClick={() =>
-                setDarkMode(
-                  !darkMode
-                )
-              }
-            >
-
-              {
-                darkMode
-                  ? "☀️ Mode clair"
-                  : "🌙 Mode sombre"
-              }
-
-            </button>
-
-            <button
-              className="popup-item"
-              onClick={() =>
-                setUnit(
-                  unit ===
-                    "celsius"
-                    ? "fahrenheit"
-                    : "celsius"
-                )
-              }
-            >
-
-              🌡️ {
-                unit ===
-                "celsius"
-                  ? "Passer en Fahrenheit"
-                  : "Passer en Celsius"
-              }
-
-            </button>
-
-          </div>
-        )
-      }
-
-      <section className="dashboard">
-
-        <header className="topbar">
-
-          <div className="search-wrapper">
-
-            <form
-              className="search"
-              onSubmit={
-                handleSubmit
-              }
-            >
-
-              <FiSearch className="search-icon" />
-
-              <input
-                type="text"
-                placeholder="Rechercher une ville..."
-                value={input}
-                onChange={(e) => {
-
-                  setInput(
-                    e.target.value
-                  );
-
-                  fetchSuggestions(
-                    e.target.value
-                  );
-                }}
-              />
-
-            </form>
-
-            {
-              suggestions.length > 0 && (
-
-                <div className="suggestions">
-
-                  {
-                    suggestions.map(
-                      (item) => (
-
-                        <button
-                          key={item.id}
-                          type="button"
-                          className="suggestion-item"
-                          onClick={() => {
-
-                            setCity(
-                              item.name
-                            );
-
-                            setInput(
-                              item.name
-                            );
-
-                            setSuggestions([]);
-                          }}
-                        >
-
-                          {
-                            item.name
-                          }
-
-                          , {
-
-                            item.country
-                          }
-
-                        </button>
-                      )
-                    )
-                  }
-
-                </div>
-              )
-            }
-
-          </div>
-
-          <button
-            className="position-btn"
-            onClick={
-              handleMyPosition
-            }
-          >
-
-            <FiMapPin />
-
-            Ma position
-
-          </button>
-
-        </header>
-
-        {
-          error && (
-
-            <p className="error-message">
-
-              {error}
-
-            </p>
-          )
-        }
-
-        {
-          loading && (
-
-            <p className="loading">
-
-              Chargement...
-
-            </p>
-          )
-        }
-
-        {
-          !loading &&
-          weather && (
-
-            <>
-
-              <motion.section
-                className="hero-card"
-                initial={{
-                  opacity:0,
-                  y:30,
-                }}
-                animate={{
-                  opacity:1,
-                  y:0,
-                }}
-              >
-
-                <div className="hero-left">
-
-                  <h1>
-
-                    {
-                      place?.name
-                    }
-
-                    , {
-
-                      place?.country
-                    }
-
-                  </h1>
-
-                  <p className="date">
-
-                    {
-                      new Intl.DateTimeFormat(
-                        "fr-FR",
-                        {
-                          weekday:"long",
-                          day:"2-digit",
-                          month:"long",
-                          hour:"2-digit",
-                          minute:"2-digit",
-                          timeZone:
-                            timezone,
-                        }
-                      ).format(time)
-                    }
-
-                  </p>
-
-                  <div className="temp-line">
-
-                    <strong>
-
-                      {
-                        convertTemp(
-                          weather.current.temperature_2m
-                        )
-                      }
-
-                      {
-                        unitSymbol()
-                      }
-
-                    </strong>
-
-                    <div>
-
-                      <h2>
-
-                        {
-                          getWeatherDescription(
-                            code,
-                            weather.current.temperature_2m
-                          )
-                        }
-
-                      </h2>
-
-                      <p>
-
-                        Ressenti : {
-
-                          convertTemp(
-                            weather.current.apparent_temperature
-                          )
-                        }
-
-                        {
-                          unitSymbol()
-                        }
-
-                      </p>
-
-                      <span>
-
-                        ↑ {
-
-                          convertTemp(
-                            weather.daily.temperature_2m_max[0]
-                          )
-                        }
-
-                        {
-                          unitSymbol()
-                        }
-
-                        {"  "}
-
-                        ↓ {
-
-                          convertTemp(
-                            weather.daily.temperature_2m_min[0]
-                          )
-                        }
-
-                        {
-                          unitSymbol()
-                        }
-
-                      </span>
-
-                      <br />
-
-                      <button
-                        className="favorite-add"
-                        onClick={
-                          addFavorite
-                        }
-                      >
-
-                        ⭐ Ajouter aux favoris
-
-                      </button>
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-                <div className="hero-weather">
-
-                  {
-                    getWeatherIcon(
-                      code,
-                      "main-weather-icon"
-                    )
-                  }
-
-                </div>
-
-              </motion.section>
-
-              <section className="forecast">
-
-                <div className="forecast-title">
-
-                  <h2>
-                    Prévisions 7 jours
-                  </h2>
-
-                </div>
-
-                <div className="forecast-grid">
-
-                  {
-                    weather.daily.time
-                      .slice(0, 7)
-                      .map((day, index) => {
-
-                        const dailyCode =
-                          weather.daily.weather_code[index];
-
-                        return (
-
-                          <motion.div
-                            key={day}
-                            className="forecast-card"
-                            whileHover={{
-                              scale:1.04,
-                            }}
-                          >
-
-                            <p>
-
-                              {
-                                new Intl.DateTimeFormat(
-                                  "fr-FR",
-                                  {
-                                    weekday:"short",
-                                    timeZone:
-                                      timezone,
-                                  }
-                                ).format(
-                                  new Date(day)
-                                )
-                              }
-
-                            </p>
-
-                            {
-                              getWeatherIcon(
-                                dailyCode,
-                                "forecast-icon"
-                              )
-                            }
-
-                            <strong>
-
-                              {
-                                convertTemp(
-                                  weather.daily.temperature_2m_max[index]
-                                )
-                              }
-
-                              {
-                                unitSymbol()
-                              }
-
-                            </strong>
-
-                            <span>
-
-                              {" "} / {" "}
-
-                              {
-                                convertTemp(
-                                  weather.daily.temperature_2m_min[index]
-                                )
-                              }
-
-                              {
-                                unitSymbol()
-                              }
-
-                            </span>
-
-                          </motion.div>
-                        );
-                      })
-                  }
-
-                </div>
-
-              </section>
-
-            </>
-          )
-        }
-
-      </section>
 
     </main>
   );
