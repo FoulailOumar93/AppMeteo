@@ -451,143 +451,126 @@ function App() {
      GEOLOCATION
   ========================================================= */
 
-async function handleMyPosition() {
+  async function handleMyPosition() {
 
-  if (!navigator.geolocation) {
+    if (!navigator.geolocation) {
 
-    setError(
-      "Géolocalisation non supportée."
-    );
+      setError(
+        "Géolocalisation non supportée."
+      );
 
-    return;
-  }
+      return;
+    }
 
-  setLoading(true);
+    setLoading(true);
 
-  setError("");
+    setError("");
 
-  navigator.geolocation.getCurrentPosition(
+    navigator.geolocation.getCurrentPosition(
 
-    async (position) => {
-
-      try {
-
-        const latitude =
-          position.coords.latitude;
-
-        const longitude =
-          position.coords.longitude;
-
-        /* =========================
-           WEATHER
-        ========================= */
-
-        const weatherResponse =
-          await fetch(
-            `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,pressure_msl&daily=weather_code,temperature_2m_max,temperature_2m_min,uv_index_max&timezone=auto`
-          );
-
-        const weatherData =
-          await weatherResponse.json();
-
-        /* =========================
-           REVERSE GEOCODING
-        ========================= */
-
-        let cityName =
-          "Ma position";
-
-        let countryName =
-          "";
+      async (position) => {
 
         try {
 
-          const geoResponse =
+          const latitude =
+            position.coords.latitude;
+
+          const longitude =
+            position.coords.longitude;
+
+          const weatherResponse =
             await fetch(
-              `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${latitude}&longitude=${longitude}&language=fr`
+              `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,pressure_msl&daily=weather_code,temperature_2m_max,temperature_2m_min,uv_index_max&timezone=auto`
             );
 
-          const geoData =
-            await geoResponse.json();
+          const weatherData =
+            await weatherResponse.json();
 
-          if (
-            geoData?.results &&
-            geoData.results.length > 0
-          ) {
+          let cityName =
+            "Ma position";
 
-            cityName =
-              geoData.results[0]
-                .name;
+          let countryName =
+            "";
 
-            countryName =
-              geoData.results[0]
-                .country;
+          try {
+
+            const geoResponse =
+              await fetch(
+                `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${latitude}&longitude=${longitude}&language=fr`
+              );
+
+            const geoData =
+              await geoResponse.json();
+
+            if (
+              geoData?.results &&
+              geoData.results.length > 0
+            ) {
+
+              cityName =
+                geoData.results[0]
+                  .name;
+
+              countryName =
+                geoData.results[0]
+                  .country;
+            }
+
+          } catch (geoError) {
+
+            console.log(
+              geoError
+            );
           }
 
-        } catch (geoError) {
-
-          console.log(
-            "Erreur géocoding",
-            geoError
+          setWeather(
+            weatherData
           );
+
+          setPlace({
+            name: cityName,
+            country:
+              countryName,
+          });
+
+          setTimezone(
+            weatherData.timezone
+          );
+
+          setInput(
+            cityName
+          );
+
+          setLoading(false);
+
+        } catch (err) {
+
+          console.log(err);
+
+          setError(
+            "Impossible de récupérer la météo."
+          );
+
+          setLoading(false);
         }
+      },
 
-        /* =========================
-           UPDATE
-        ========================= */
-
-        setWeather(
-          weatherData
-        );
-
-        setPlace({
-          name: cityName,
-          country:
-            countryName,
-        });
-
-        setTimezone(
-          weatherData.timezone
-        );
-
-        setInput(
-          cityName
-        );
-
-        setLoading(false);
-
-      } catch (err) {
-
-        console.log(err);
+      () => {
 
         setError(
-          "Impossible de récupérer la météo."
+          "Permission refusée."
         );
 
         setLoading(false);
+      },
+
+      {
+        enableHighAccuracy:true,
+        timeout:10000,
+        maximumAge:0,
       }
-    },
-
-    (geoError) => {
-
-      console.log(
-        geoError
-      );
-
-      setError(
-        "Permission refusée ou localisation impossible."
-      );
-
-      setLoading(false);
-    },
-
-    {
-      enableHighAccuracy:true,
-      timeout:10000,
-      maximumAge:0,
-    }
-  );
-}
+    );
+  }
 
   /* =========================================================
      SUGGESTIONS
@@ -709,8 +692,6 @@ async function handleMyPosition() {
       }`}
     >
 
-      {/* SIDEBAR */}
-
       <aside className="sidebar">
 
         <div className="side-logo">
@@ -770,8 +751,6 @@ async function handleMyPosition() {
         </button>
 
       </aside>
-
-      {/* FAVORITES */}
 
       {
         showFavorites && (
@@ -862,8 +841,6 @@ async function handleMyPosition() {
         )
       }
 
-      {/* SETTINGS */}
-
       {
         showSettings && (
 
@@ -927,8 +904,6 @@ async function handleMyPosition() {
           </div>
         )
       }
-
-      {/* DASHBOARD */}
 
       <section className="dashboard">
 
@@ -1051,155 +1026,252 @@ async function handleMyPosition() {
           !loading &&
           weather && (
 
-            <motion.section
-              className="hero-card"
-              initial={{
-                opacity:0,
-                y:30,
-              }}
-              animate={{
-                opacity:1,
-                y:0,
-              }}
-            >
+            <>
 
-              <div className="hero-left">
+              <motion.section
+                className="hero-card"
+                initial={{
+                  opacity:0,
+                  y:30,
+                }}
+                animate={{
+                  opacity:1,
+                  y:0,
+                }}
+              >
 
-                <h1>
+                <div className="hero-left">
 
-                  {
-                    place?.name
-                  }
-
-                  , {
-
-                    place?.country
-                  }
-
-                </h1>
-
-                <p className="date">
-
-                  {
-                    new Intl.DateTimeFormat(
-                      "fr-FR",
-                      {
-                        weekday:"long",
-                        day:"2-digit",
-                        month:"long",
-                        hour:"2-digit",
-                        minute:"2-digit",
-                        timeZone:
-                          timezone,
-                      }
-                    ).format(time)
-                  }
-
-                </p>
-
-                <div className="temp-line">
-
-                  <strong>
+                  <h1>
 
                     {
-                      convertTemp(
-                        weather.current.temperature_2m
-                      )
+                      place?.name
                     }
+
+                    , {
+
+                      place?.country
+                    }
+
+                  </h1>
+
+                  <p className="date">
 
                     {
-                      unitSymbol()
+                      new Intl.DateTimeFormat(
+                        "fr-FR",
+                        {
+                          weekday:"long",
+                          day:"2-digit",
+                          month:"long",
+                          hour:"2-digit",
+                          minute:"2-digit",
+                          timeZone:
+                            timezone,
+                        }
+                      ).format(time)
                     }
 
-                  </strong>
+                  </p>
 
-                  <div>
+                  <div className="temp-line">
 
-                    <h2>
+                    <strong>
 
                       {
-                        getWeatherDescription(
-                          code,
+                        convertTemp(
                           weather.current.temperature_2m
                         )
                       }
 
-                    </h2>
-
-                    <p>
-
-                      Ressenti : {
-
-                        convertTemp(
-                          weather.current.apparent_temperature
-                        )
-                      }
-
                       {
                         unitSymbol()
                       }
 
-                    </p>
+                    </strong>
 
-                    <span>
+                    <div>
 
-                      ↑ {
+                      <h2>
 
-                        convertTemp(
-                          weather.daily.temperature_2m_max[0]
-                        )
-                      }
+                        {
+                          getWeatherDescription(
+                            code,
+                            weather.current.temperature_2m
+                          )
+                        }
 
-                      {
-                        unitSymbol()
-                      }
+                      </h2>
 
-                      {"  "}
+                      <p>
 
-                      ↓ {
+                        Ressenti : {
 
-                        convertTemp(
-                          weather.daily.temperature_2m_min[0]
-                        )
-                      }
+                          convertTemp(
+                            weather.current.apparent_temperature
+                          )
+                        }
 
-                      {
-                        unitSymbol()
-                      }
+                        {
+                          unitSymbol()
+                        }
 
-                    </span>
+                      </p>
 
-                    <br />
+                      <span>
 
-                    <button
-                      className="favorite-add"
-                      onClick={
-                        addFavorite
-                      }
-                    >
+                        ↑ {
 
-                      ⭐ Ajouter aux favoris
+                          convertTemp(
+                            weather.daily.temperature_2m_max[0]
+                          )
+                        }
 
-                    </button>
+                        {
+                          unitSymbol()
+                        }
+
+                        {"  "}
+
+                        ↓ {
+
+                          convertTemp(
+                            weather.daily.temperature_2m_min[0]
+                          )
+                        }
+
+                        {
+                          unitSymbol()
+                        }
+
+                      </span>
+
+                      <br />
+
+                      <button
+                        className="favorite-add"
+                        onClick={
+                          addFavorite
+                        }
+                      >
+
+                        ⭐ Ajouter aux favoris
+
+                      </button>
+
+                    </div>
 
                   </div>
 
                 </div>
 
-              </div>
+                <div className="hero-weather">
 
-              <div className="hero-weather">
+                  {
+                    getWeatherIcon(
+                      code,
+                      "main-weather-icon"
+                    )
+                  }
 
-                {
-                  getWeatherIcon(
-                    code,
-                    "main-weather-icon"
-                  )
-                }
+                </div>
 
-              </div>
+              </motion.section>
 
-            </motion.section>
+              <section className="forecast">
+
+                <div className="forecast-title">
+
+                  <h2>
+                    Prévisions 7 jours
+                  </h2>
+
+                </div>
+
+                <div className="forecast-grid">
+
+                  {
+                    weather.daily.time
+                      .slice(0, 7)
+                      .map((day, index) => {
+
+                        const dailyCode =
+                          weather.daily.weather_code[index];
+
+                        return (
+
+                          <motion.div
+                            key={day}
+                            className="forecast-card"
+                            whileHover={{
+                              scale:1.04,
+                            }}
+                          >
+
+                            <p>
+
+                              {
+                                new Intl.DateTimeFormat(
+                                  "fr-FR",
+                                  {
+                                    weekday:"short",
+                                    timeZone:
+                                      timezone,
+                                  }
+                                ).format(
+                                  new Date(day)
+                                )
+                              }
+
+                            </p>
+
+                            {
+                              getWeatherIcon(
+                                dailyCode,
+                                "forecast-icon"
+                              )
+                            }
+
+                            <strong>
+
+                              {
+                                convertTemp(
+                                  weather.daily.temperature_2m_max[index]
+                                )
+                              }
+
+                              {
+                                unitSymbol()
+                              }
+
+                            </strong>
+
+                            <span>
+
+                              {" "} / {" "}
+
+                              {
+                                convertTemp(
+                                  weather.daily.temperature_2m_min[index]
+                                )
+                              }
+
+                              {
+                                unitSymbol()
+                              }
+
+                            </span>
+
+                          </motion.div>
+                        );
+                      })
+                  }
+
+                </div>
+
+              </section>
+
+            </>
           )
         }
 
