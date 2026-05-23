@@ -1,0 +1,1119 @@
+/* =========================================================
+   RESET
+========================================================= */
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+html,
+body,
+#root{
+  width:100%;
+  min-height:100vh;
+}
+
+body{
+  font-family:"Inter",sans-serif;
+  overflow-x:hidden;
+}
+
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+:root{
+
+  --text:#ffffff;
+
+  --soft:
+  rgba(255,255,255,0.72);
+
+  --glass:
+  rgba(255,255,255,0.08);
+
+  --glass-hover:
+  rgba(255,255,255,0.16);
+
+  --glass-border:
+  rgba(255,255,255,0.12);
+
+  --shadow:
+  0 12px 45px rgba(0,0,0,0.24);
+
+  --blur:22px;
+}
+
+/* =========================================================
+   APP
+========================================================= */
+
+.app{
+
+  width:100%;
+
+  min-height:100vh;
+
+  display:flex;
+
+  gap:24px;
+
+  padding:24px;
+
+  position:relative;
+
+  overflow:hidden;
+
+  color:var(--text);
+
+  transition:0.4s;
+}
+
+/* =========================================================
+   BACKGROUND
+========================================================= */
+
+.app::before{
+
+  content:"";
+
+  position:fixed;
+
+  inset:0;
+
+  z-index:-5;
+
+  transition:0.6s ease;
+}
+
+/* SUNNY */
+
+.app.sunny::before{
+
+  background:
+  linear-gradient(
+    135deg,
+    #0f2747 0%,
+    #2563eb 45%,
+    #f59e0b 100%
+  );
+}
+
+/* RAIN */
+
+.app.rain::before{
+
+  background:
+  linear-gradient(
+    135deg,
+    #020617 0%,
+    #0f2747 50%,
+    #1d4ed8 100%
+  );
+}
+
+/* COLD */
+
+.app.cold::before{
+
+  background:
+  linear-gradient(
+    135deg,
+    #020617 0%,
+    #1e3a8a 45%,
+    #38bdf8 100%
+  );
+}
+
+/* HOT */
+
+.app.hot::before{
+
+  background:
+  linear-gradient(
+    135deg,
+    #7c2d12 0%,
+    #dc2626 45%,
+    #f97316 100%
+  );
+}
+
+/* NIGHT */
+
+.app.night::before{
+
+  background:
+  linear-gradient(
+    135deg,
+    #020617 0%,
+    #071a36 50%,
+    #0f172a 100%
+  );
+}
+
+/* AFTERNOON */
+
+.app.afternoon::before{
+
+  background:
+  linear-gradient(
+    135deg,
+    #1e293b 0%,
+    #ea580c 50%,
+    #facc15 100%
+  );
+}
+
+/* =========================================================
+   LIGHT MODE
+========================================================= */
+
+.app.light{
+
+  --text:#071226;
+
+  --soft:
+  rgba(0,0,0,0.6);
+
+  --glass:
+  rgba(255,255,255,0.65);
+
+  --glass-hover:
+  rgba(255,255,255,0.92);
+
+  --glass-border:
+  rgba(255,255,255,0.4);
+}
+
+.app.light::before{
+
+  background:
+  linear-gradient(
+    135deg,
+    #dbeafe 0%,
+    #bfdbfe 50%,
+    #93c5fd 100%
+  ) !important;
+}
+
+/* =========================================================
+   RAIN EFFECT
+========================================================= */
+
+.app.rain::after{
+
+  content:"";
+
+  position:fixed;
+
+  inset:0;
+
+  pointer-events:none;
+
+  z-index:-4;
+
+  opacity:0.35;
+
+  background-image:
+  linear-gradient(
+    transparent 0%,
+    rgba(255,255,255,0.24) 100%
+  );
+
+  background-size:2px 90px;
+
+  animation:rain 0.35s linear infinite;
+}
+
+@keyframes rain{
+
+  from{
+    transform:translateY(-100px);
+  }
+
+  to{
+    transform:translateY(100px);
+  }
+}
+
+/* =========================================================
+   GLASS EFFECT
+========================================================= */
+
+@keyframes glassGlow{
+
+  0%{
+    transform:translateY(0px);
+  }
+
+  50%{
+    transform:translateY(-4px);
+  }
+
+  100%{
+    transform:translateY(0px);
+  }
+}
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.sidebar{
+
+  width:92px;
+
+  min-height:calc(100vh - 48px);
+
+  border-radius:36px;
+
+  background:var(--glass);
+
+  border:
+  1px solid var(--glass-border);
+
+  backdrop-filter:
+  blur(var(--blur));
+
+  box-shadow:var(--shadow);
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+
+  gap:22px;
+
+  padding:24px 0;
+
+  flex-shrink:0;
+
+  z-index:20;
+}
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.side-logo,
+.side-btn{
+
+  width:60px;
+  height:60px;
+
+  border-radius:22px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.side-logo{
+
+  background:
+  rgba(255,255,255,0.1);
+
+  color:#facc15;
+
+  font-size:30px;
+
+  border:
+  1px solid rgba(255,255,255,0.12);
+}
+
+.side-btn{
+
+  border:none;
+
+  background:
+  rgba(255,255,255,0.03);
+
+  border:
+  1px solid transparent;
+
+  color:var(--text);
+
+  font-size:25px;
+
+  cursor:pointer;
+
+  transition:0.25s;
+}
+
+/* GLASS HOVER */
+
+.side-btn:hover,
+.side-btn.active,
+.position-btn:hover,
+.favorite-add:hover,
+.popup-item:hover,
+.forecast-card:hover,
+.info-card:hover{
+
+  background:
+  rgba(255,255,255,0.18);
+
+  border:
+  1px solid rgba(255,255,255,0.25);
+
+  backdrop-filter:
+  blur(30px);
+
+  box-shadow:
+  0 10px 35px rgba(255,255,255,0.12);
+
+  animation:
+  glassGlow 1.4s ease infinite;
+}
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+.dashboard{
+
+  flex:1;
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:24px;
+
+  min-width:0;
+}
+
+/* =========================================================
+   TOPBAR
+========================================================= */
+
+.topbar{
+
+  width:100%;
+
+  display:flex;
+
+  align-items:center;
+
+  gap:24px;
+}
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.search-wrapper{
+
+  flex:1;
+
+  position:relative;
+
+  z-index:9999;
+}
+
+.search{
+
+  width:100%;
+
+  height:98px;
+
+  border-radius:36px;
+
+  background:var(--glass);
+
+  border:
+  1px solid var(--glass-border);
+
+  backdrop-filter:
+  blur(var(--blur));
+
+  display:flex;
+
+  align-items:center;
+
+  gap:22px;
+
+  padding:0 32px;
+
+  box-shadow:var(--shadow);
+
+  transition:0.25s;
+}
+
+.search:hover{
+
+  background:var(--glass-hover);
+}
+
+.search-icon{
+
+  font-size:38px;
+
+  color:var(--soft);
+}
+
+.search input{
+
+  width:100%;
+
+  border:none;
+  outline:none;
+
+  background:transparent;
+
+  color:var(--text);
+
+  font-size:32px;
+
+  font-weight:800;
+}
+
+.search input::placeholder{
+
+  color:var(--soft);
+}
+
+/* =========================================================
+   SUGGESTIONS
+========================================================= */
+
+.suggestions{
+
+  position:absolute;
+
+  top:108px;
+  left:0;
+
+  width:100%;
+
+  overflow:hidden;
+
+  border-radius:28px;
+
+  background:
+  rgba(3,10,20,0.95);
+
+  border:
+  1px solid rgba(255,255,255,0.08);
+
+  backdrop-filter:
+  blur(25px);
+
+  z-index:99999;
+
+  box-shadow:
+  0 20px 50px rgba(0,0,0,0.3);
+}
+
+.suggestion-item{
+
+  width:100%;
+
+  border:none;
+
+  background:transparent;
+
+  color:white;
+
+  padding:20px 24px;
+
+  text-align:left;
+
+  font-size:18px;
+
+  cursor:pointer;
+
+  transition:0.2s;
+}
+
+.suggestion-item:hover{
+
+  background:
+  rgba(255,255,255,0.1);
+}
+
+/* =========================================================
+   POSITION BUTTON
+========================================================= */
+
+.position-btn{
+
+  width:300px;
+
+  height:98px;
+
+  border:none;
+
+  border-radius:36px;
+
+  background:var(--glass);
+
+  border:
+  1px solid var(--glass-border);
+
+  backdrop-filter:
+  blur(var(--blur));
+
+  color:var(--text);
+
+  font-size:22px;
+
+  font-weight:800;
+
+  cursor:pointer;
+
+  box-shadow:var(--shadow);
+
+  transition:0.25s;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:12px;
+}
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.error-message{
+
+  font-size:22px;
+
+  font-weight:700;
+
+  color:#f87171;
+}
+
+/* =========================================================
+   POPUP
+========================================================= */
+
+.popup-panel{
+
+  position:absolute;
+
+  top:100px;
+  left:0;
+
+  width:380px;
+
+  border-radius:36px;
+
+  padding:30px;
+
+  background:
+  rgba(3,10,20,0.96);
+
+  border:
+  1px solid rgba(255,255,255,0.08);
+
+  backdrop-filter:
+  blur(25px);
+
+  z-index:999999;
+
+  box-shadow:
+  0 20px 60px rgba(0,0,0,0.35);
+}
+
+.popup-header{
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  margin-bottom:20px;
+}
+
+.popup-header h3{
+
+  font-size:38px;
+}
+
+/* CLOSE BUTTON */
+
+.close-popup{
+
+  width:46px;
+  height:46px;
+
+  border:none;
+
+  border-radius:16px;
+
+  background:
+  rgba(255,255,255,0.08);
+
+  color:white;
+
+  font-size:24px;
+
+  cursor:pointer;
+
+  transition:0.2s;
+}
+
+.close-popup:hover{
+
+  background:
+  rgba(255,255,255,0.16);
+
+  transform:rotate(90deg);
+}
+
+/* POPUP ITEM */
+
+.popup-item{
+
+  width:100%;
+
+  border:none;
+
+  border-radius:20px;
+
+  padding:18px;
+
+  margin-bottom:14px;
+
+  background:
+  rgba(255,255,255,0.08);
+
+  border:
+  1px solid transparent;
+
+  color:white;
+
+  text-align:left;
+
+  font-size:18px;
+
+  font-weight:700;
+
+  cursor:pointer;
+
+  transition:0.25s;
+}
+
+/* FAVORITE */
+
+.favorite-row{
+
+  display:flex;
+
+  gap:12px;
+
+  margin-bottom:12px;
+}
+
+.favorite-city{
+
+  flex:1;
+}
+
+.delete-fav{
+
+  width:60px;
+
+  border:none;
+
+  border-radius:18px;
+
+  background:
+  rgba(255,80,80,0.18);
+
+  color:white;
+
+  font-size:24px;
+
+  cursor:pointer;
+
+  transition:0.2s;
+}
+
+.delete-fav:hover{
+
+  background:
+  rgba(255,80,80,0.35);
+
+  transform:scale(1.05);
+}
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero-card{
+
+  width:100%;
+
+  min-height:450px;
+
+  border-radius:46px;
+
+  padding:58px;
+
+  background:var(--glass);
+
+  border:
+  1px solid var(--glass-border);
+
+  backdrop-filter:
+  blur(var(--blur));
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:50px;
+
+  box-shadow:var(--shadow);
+}
+
+.hero-left{
+
+  flex:1;
+
+  min-width:0;
+}
+
+.hero-left h1{
+
+  font-size:clamp(56px,5vw,96px);
+
+  line-height:1.05;
+
+  margin-bottom:30px;
+}
+
+.date{
+
+  font-size:30px;
+
+  color:var(--soft);
+
+  margin-bottom:34px;
+}
+
+.temp-line{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:52px;
+}
+
+.temp-line strong{
+
+  font-size:clamp(120px,10vw,200px);
+
+  line-height:1;
+}
+
+.temp-line h2{
+
+  font-size:clamp(42px,4vw,64px);
+}
+
+.temp-line p{
+
+  font-size:34px;
+}
+
+.temp-line span{
+
+  font-size:24px;
+
+  color:var(--soft);
+}
+
+.main-weather-icon{
+
+  font-size:clamp(170px,14vw,270px);
+
+  flex-shrink:0;
+}
+
+/* =========================================================
+   FAVORITE BUTTON
+========================================================= */
+
+.favorite-add{
+
+  margin-top:24px;
+
+  border:none;
+
+  border-radius:22px;
+
+  padding:16px 28px;
+
+  background:
+  rgba(255,255,255,0.12);
+
+  border:
+  1px solid transparent;
+
+  color:var(--text);
+
+  font-size:18px;
+
+  font-weight:800;
+
+  cursor:pointer;
+
+  transition:0.25s;
+}
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+.cards{
+
+  width:100%;
+
+  display:grid;
+
+  grid-template-columns:
+  repeat(auto-fit,minmax(240px,1fr));
+
+  gap:24px;
+}
+
+.info-card{
+
+  min-height:240px;
+
+  border-radius:38px;
+
+  background:var(--glass);
+
+  border:
+  1px solid var(--glass-border);
+
+  backdrop-filter:
+  blur(var(--blur));
+
+  padding:30px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+
+  justify-content:center;
+
+  text-align:center;
+
+  box-shadow:var(--shadow);
+
+  transition:0.25s;
+}
+
+.info-card svg{
+
+  font-size:60px;
+
+  margin-bottom:16px;
+}
+
+.info-card p{
+
+  font-size:24px;
+
+  margin-bottom:10px;
+}
+
+.info-card strong{
+
+  font-size:56px;
+}
+
+/* =========================================================
+   FORECAST
+========================================================= */
+
+.forecast{
+
+  width:100%;
+
+  border-radius:44px;
+
+  padding:38px;
+
+  background:var(--glass);
+
+  border:
+  1px solid var(--glass-border);
+
+  backdrop-filter:
+  blur(var(--blur));
+
+  box-shadow:var(--shadow);
+}
+
+.forecast-title h2{
+
+  font-size:46px;
+
+  margin-bottom:30px;
+}
+
+.forecast-grid{
+
+  display:grid;
+
+  grid-template-columns:
+  repeat(auto-fit,minmax(190px,1fr));
+
+  gap:24px;
+}
+
+.forecast-card{
+
+  min-height:200px;
+
+  border-radius:32px;
+
+  background:
+  rgba(255,255,255,0.08);
+
+  border:
+  1px solid transparent;
+
+  padding:28px;
+
+  text-align:center;
+
+  transition:0.25s;
+}
+
+.forecast-card p{
+
+  font-size:22px;
+
+  margin-bottom:14px;
+}
+
+.forecast-icon{
+
+  font-size:70px;
+
+  margin-bottom:14px;
+}
+
+.forecast-card strong{
+
+  font-size:34px;
+}
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.loading{
+
+  font-size:24px;
+
+  font-weight:700;
+
+  color:var(--soft);
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:1100px){
+
+  .hero-card{
+
+    flex-direction:column;
+
+    text-align:center;
+  }
+
+  .temp-line{
+
+    justify-content:center;
+  }
+}
+
+@media(max-width:850px){
+
+  .app{
+
+    flex-direction:column;
+
+    padding:16px;
+  }
+
+  .sidebar{
+
+    width:100%;
+
+    min-height:auto;
+
+    flex-direction:row;
+
+    justify-content:center;
+  }
+
+  .topbar{
+
+    flex-direction:column;
+  }
+
+  .position-btn{
+
+    width:100%;
+  }
+
+  .temp-line{
+
+    flex-direction:column;
+  }
+
+  .cards{
+
+    grid-template-columns:1fr;
+  }
+
+  .popup-panel{
+
+    width:100%;
+  }
+
+  .hero-card{
+
+    padding:34px;
+  }
+
+  .hero-left h1{
+
+    font-size:54px;
+  }
+
+  .temp-line strong{
+
+    font-size:120px;
+  }
+
+  .main-weather-icon{
+
+    font-size:150px;
+  }
+}
