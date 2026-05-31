@@ -30,7 +30,10 @@ function App() {
   const [place, setPlace] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [time, setTime] = useState(new Date());
+  const [cityTime, setCityTime] = useState({
+  current: new Date(),
+  timezone: "Europe/Paris",
+});
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -44,10 +47,16 @@ function App() {
     setTimeout(() => setToast(""), 2500);
   }
 
-  useEffect(() => {
-    const interval = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(interval);
-  }, []);
+ useEffect(() => {
+  const interval = setInterval(() => {
+    setCityTime((prev) => ({
+      ...prev,
+      current: new Date(),
+    }));
+  }, 1000);
+
+  return () => clearInterval(interval);
+}, []);
 
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem("favorites")) || [];
@@ -102,7 +111,13 @@ function App() {
     if (!weather) return "sunny";
 
     const code = weather.current.weather_code;
-    const hour = time.getHours();
+    const hour = Number(
+  cityTime.current.toLocaleString("en-US", {
+    hour: "numeric",
+    hour12: false,
+    timeZone: cityTime.timezone,
+  })
+);
 
     if ([51, 61, 63, 80, 81, 82].includes(code)) return "rain";
     if ([95, 96, 99].includes(code)) return "storm";
@@ -140,7 +155,10 @@ function App() {
       const weatherData = await weatherResponse.json();
 
       setWeather(weatherData);
-
+setCityTime({
+  current: new Date(),
+  timezone: weatherData.timezone,
+});
       setPlace({
         name: location.name,
         country: location.country,
@@ -268,20 +286,23 @@ function App() {
   }
 
   function formatDate() {
-    return time.toLocaleDateString("fr-FR", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  }
+  return cityTime.current.toLocaleDateString("fr-FR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: cityTime.timezone,
+  });
+}
 
-  function formatTime() {
-    return time.toLocaleTimeString("fr-FR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  }
+ function formatTime() {
+  return cityTime.current.toLocaleTimeString("fr-FR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    timeZone: cityTime.timezone,
+  });
+}
 
   const code = weather?.current?.weather_code;
   const currentTemp = weather?.current?.temperature_2m;
